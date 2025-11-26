@@ -30,7 +30,7 @@ LOCAL_MODEL_PATH = '' # Path to the local model (Qwen3-8B)
 SBERT_PATH = '' # SentenceBert path  
 ```
 
-## Offline knowledge extraction
+## Offline Knowledge Extraction
 
 To extract the structured knowledge, first enter the specified directory, then run the offline extraction program.
 
