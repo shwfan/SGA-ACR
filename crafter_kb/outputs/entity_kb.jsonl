@@ -1,0 +1,22 @@
+{"name": "tree", "type": "resource", "knowledge": ["Can be collected without tools to get wood.", "Leaves grass behind when collected."], "related_subgoals": ["collect_wood"]}
+{"name": "grass", "type": "resource", "knowledge": ["Can be collected without tools to get saplings.", "Has a 10% chance to drop saplings when collected."], "related_subgoals": ["collect_sapling", "place_plant"]}
+{"name": "stone", "type": "resource", "knowledge": ["Requires wood_pickaxe to collect.", "Leaves path behind when collected."], "related_subgoals": ["collect_stone", "place_stone", "place_furnace", "make_stone_pickaxe", "make_stone_sword"]}
+{"name": "coal", "type": "resource", "knowledge": ["Requires wood_pickaxe to collect.", "Leaves path behind when collected."], "related_subgoals": ["collect_coal", "make_iron_pickaxe", "make_iron_sword"]}
+{"name": "iron", "type": "resource", "knowledge": ["Requires stone_pickaxe to collect.", "Leaves path behind when collected."], "related_subgoals": ["collect_iron", "make_iron_pickaxe", "make_iron_sword"]}
+{"name": "diamond", "type": "resource", "knowledge": ["Requires iron_pickaxe to collect.", "Leaves path behind when collected."], "related_subgoals": ["collect_diamond"]}
+{"name": "water", "type": "resource", "knowledge": ["Can be collected without tools to restore drink.", "Cannot be walked on by player."], "related_subgoals": ["collect_water"]}
+{"name": "wood", "type": "material", "knowledge": ["Used to craft tables and basic tools.", "Collected from trees."], "related_subgoals": ["collect_wood", "place_table", "make_wood_pickaxe", "make_wood_sword", "make_stone_pickaxe", "make_stone_sword", "make_iron_pickaxe", "make_iron_sword"]}
+{"name": "sapling", "type": "material", "knowledge": ["Used to plant crops for food.", "Collected from grass with 10% chance."], "related_subgoals": ["collect_sapling", "place_plant"]}
+{"name": "sand", "type": "material", "knowledge": ["Sand is typically found near water sources"], "related_subgoals": ["collect_water"]}
+{"name": "table", "type": "object", "knowledge": ["Required to craft wood and stone tools.", "Placed on grass, sand or path."], "related_subgoals": ["place_table", "make_wood_pickaxe", "make_stone_pickaxe", "make_wood_sword", "make_stone_sword"]}
+{"name": "furnace", "type": "object", "knowledge": ["Required to craft iron tools.", "Placed on grass, sand or path."], "related_subgoals": ["place_furnace", "make_iron_pickaxe", "make_iron_sword"]}
+{"name": "plant", "type": "object", "knowledge": ["Grows over time and provides food when ripe.", "Planted on grass using saplings."], "related_subgoals": ["place_plant", "eat_plant"]}
+{"name": "wood_pickaxe", "type": "tool", "knowledge": ["Required to collect stone and coal.", "Crafted at table using wood."], "related_subgoals": ["make_wood_pickaxe", "collect_stone", "collect_coal"]}
+{"name": "stone_pickaxe", "type": "tool", "knowledge": ["Required to collect iron.", "Crafted at table using wood and stone."], "related_subgoals": ["make_stone_pickaxe", "collect_iron"]}
+{"name": "iron_pickaxe", "type": "tool", "knowledge": ["Required to collect diamonds.", "Crafted at furnace using wood, coal and iron."], "related_subgoals": ["make_iron_pickaxe", "collect_diamond"]}
+{"name": "wood_sword", "type": "tool", "knowledge": ["Deals 2 damage to enemies.", "Crafted at table using wood."], "related_subgoals": ["make_wood_sword", "defeat_zombie", "defeat_skeleton", "eat_cow"]}
+{"name": "stone_sword", "type": "tool", "knowledge": ["Deals 3 damage to enemies.", "Crafted at table using wood and stone."], "related_subgoals": ["make_stone_sword", "defeat_zombie", "defeat_skeleton", "eat_cow"]}
+{"name": "iron_sword", "type": "tool", "knowledge": ["Deals 5 damage to enemies.", "Crafted at furnace using wood, coal and iron."], "related_subgoals": ["make_iron_sword", "defeat_zombie", "defeat_skeleton", "eat_cow"]}
+{"name": "cow", "type": "creature", "knowledge": ["Wanders randomly.", "Provides food when defeated."], "related_subgoals": ["eat_cow"]}
+{"name": "zombie", "type": "creature", "knowledge": ["Attacks player when nearby.", "Very dangerous if you don't have a sword to defeat it!"], "related_subgoals": ["defeat_zombie"]}
+{"name": "skeleton", "type": "creature", "knowledge": ["Shoots arrows from distance.", "Very dangerous if you don't have a sword to defeat it!"], "related_subgoals": ["defeat_skeleton"]}

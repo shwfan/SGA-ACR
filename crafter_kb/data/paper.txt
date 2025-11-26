@@ -1,0 +1,103 @@
+Abstract
+Evaluating the general abilities of intelligent agents requires complex simulation environments. Existing benchmarks typically evaluate only one narrow task per environment, requiring researchers to perform expensive training runs on many different environments. We introduce Crafter, an open world survival game with visual inputs that evaluates a wide range of general abilities within a single environment. Agents either learn from the provided reward signal or through intrinsic objectives and are evaluated by semantically meaningful achievements that can be unlocked during each episode, such as discovering resources and crafting tools. Consistently unlocking all achievements requires strong generalization, deep exploration, and long-term reasoning. We experimentally verify that Crafter is of appropriate difficulty to drive future research and provide baselines scores of reward agents and unsupervised agents. Furthermore, we observe sophisticated behaviors emerging from maximizing the reward signal, such as building tunnel systems, bridges, houses, and plantations. We hope that Crafter will accelerate research progress by quickly evaluating a wide spectrum of abilities.
+
+\section{Introduction}
+\label{sec:intro}
+
+Crafter is an open world survival game for reinforcement learning research. Shown in \cref{fig:first}, Crafter features randomly generated 2D worlds with forests, lakes, mountains, and caves. The player needs to forage for food and water, find shelter to sleep, defend against monsters, collect materials, and build tools. The game mechanics are inspired by the popular game Minecraft and were simplified and optimized for research productivity. Crafter aims to be a fruitful benchmark for reinforcement learning by focusing on the following design goals:
+
+\paragraph{Research challenges}
+Crafter poses substantial challenges to current methods. Procedural generation requires strong generalization, the technology tree evaluates wide and deep exploration, image observations calls for representation learning, repeated subtasks and sparse rewards evaluate long-term reasoning and credit assignment.
+
+\paragraph{Meaningful evaluation}
+Agents are evaluated by a range of achievements that can be unlocked in each episode. The achievements correspond to meaningful milestones in behavior, offering insights into ability spectrum of both reward agents and unsupervised agents.
+
+\paragraph{Iteration speed}
+Crafter evaluates many agent abilities within a single environment, vastly reducing the computational requirements over benchmarks suites that require training on many separate environments from scratch, while making it more likely that the measured performance is representative of new domains.
+
+\input{figures/achievements/figure}
+
+\section{Crafter Benchmark}
+\label{sec:crafter}
+
+We introduce Crafter, a benchmark that evaluates a variety of agent abilities in a single environment. This section describes the game mechanics of the environment, the interface of agent inputs and actions, the evaluation protocol that is based on a range of semantically meaningful achievements, and the open challenges that Crafter poses for future research.
+
+\subsection{Game Mechanics}
+\label{sec:gameplay}
+
+This section describes the game mechanics of Crafter, namely its randomly generated world maps, the levels of health and other internal quantities that the player has to maintain, the resources it can collect and objects and tools it can make from them, as well as the creatures and how they are influenced by the time of day. The images of all materials and objects are shown in \cref{fig:textures}. All randomness in the environment is uniquely determined by an integer seed that is derived from the initial seed passed to the environment and the episode number.
+
+\paragraph{Terrain generation}
+A unique world is generated for every episode, shown in \cref{fig:maps}. The world leverages an underlying grid of $64\times64$ cells but the agent only observes the world through pixel images. The terrain features grasslands, lakes, and mountains. Lakes can have shores, grasslands can have forests, and mountains can have caves, ores, and lava. These are determined by OpenSimplex noise \cite{kurt2014opensimplex}, a form of locally smooth noise. Within the areas determined by noise, objects appear with equal probability at any location, such as trees in forests and skeletons in caves.
+
+\paragraph{Health and survival}
+The player has levels of health, food, water, and rest that it must prevent from reaching zero. The levels for food, water, and rest decrease over time and are restored by drinking from a lake, chasing cows or growing fruits to eat, and sleeping in places where monsters cannot attack. Once one of the three levels reaches zero, the player starts losing health points. It can also lose health points when attacked by monsters. When the health points reach zero, the player dies. Health points regenerate over time when the player is not hungry, thirsty, or sleepy.
+
+\paragraph{Resources and crafting}
+There are many resources, such as saplings, wood, stone, coal, iron, and diamonds, the player can collect in its inventory and use to build tools and place objects in the world. Many of the resources require tools that the place must first build from more basic resources, leading to a technology tree with several levels. Standing nearby a table enables the player to craft wood pickaxes and swords, as well as stone pickaxes and stone swords. Crafting a furnace from stone enables crafting iron pickaxes and iron swords from both iron, coal, and wood.
+
+\paragraph{Creatures and night}
+Creatures are initialized in random locations and move randomly. Zombies and cows live in grasslands and are automatically spawned and despawned to ensure a given amount of creatures. At night, the agent's view is restricted and noisy and a larger number of zombies is spawned. This makes it difficult to survive without securing a shelter, such as a cave. Skeletons live in caves and try to keep the player at a distance to shoot arrows at the player. The player can interact with creatures to decrease their health points. Cows move randomly and offer a food source.
+
+\subsection{Environment Interface}
+\label{sec:interface}
+
+This section defines the specification of the environment, explains the available actions, agent inputs, episode termination, and additional information provided by the environment. The design goal of these is to make the environment easy to use and inspect. The environment uses the Gym interface \citep{brockman2016gym} with visual agent inputs and flat categorical actions.
+
+\paragraph{Observations}
+Agent receive color images of size $64\times64\times3$ as their only inputs. The image shows a local top-down view of the map, reaching 4 cells west and east and 3 cells north and south of the player position. Below this view of the world, the image shows the current inventory state of the player, including its health points, food, water, and rest levels, collected materials, and crafted tools. The agent needs to learn to read its inventory state out of the image.
+
+\paragraph{Actions}
+The action space is a flat categorical space with 17 actions, represented by integer indices. The actions allow the player to move in all 4 directions along the grid, interact with the object in front of it, go to sleep, place objects, and make tools. Each object and tool has a separate action associated with it. Tools are kept in the inventory whereas objects are automatically placed in front of the player. If the agent does not hold the required materials for making an object or tool, the action has no effect.
+
+\paragraph{Termination}
+Each episode terminates when the player's health points reach 0. This can happen when the player dies out of hunger, thirst, or tiredness, when attacked by a zombie or skeleton, or when falling into lava. Health points automatically regenerate, as long as the agent is not too hungry, thirsty, or sleepy. There is no negative reward for dying, as the reward signal already includes a penalty for losing health points. Episodes also end when reaching the time limit of 10,000 steps.
+
+\paragraph{Additional information}
+The environment allows access to privileged information about the world state that the agent is forbidden to observe. This includes numeric inventory counts, achievement counts, the current coordinate of the player on the grid, and a semantic grid representation of the map. These can be used for debugging purposes or for other research scenarios, such as predicting the underlying environment state to evaluate representation learning or video prediction models.
+
+\subsection{Evaluation Protocol}
+\label{sec:evaluation}
+
+To evaluate the diverse abilities of artificial agents on Crafter, we define two benchmarks. The first benchmark allows agents to access a provided reward signal, while the second benchmark does not and requires agents to purely learn from intrinsic objectives. Besides access to the provided reward signal, the evaluation protocols are identical. An agent is granted a budget of 1M environment steps to interact with the environment. The agent performance is evaluated through \emph{success rates} of the individual achievements throughout its training, as well as an aggregated \emph{score}.
+
+\paragraph{Achievements}
+To evaluate a wide spectrum of agent abilities, Crafter defines 22 achievements. The achievements are shown in \cref{fig:achievements} and correspond to semantically meaningful behaviors, such as collecting various resources, building objects and tools, finding food and water, defeating monsters, and waking up safely after sleeping. The achievements cover a wide range of difficulties, making them suitable to evaluate both weak and strong players and providing continuous feedback throughout the development process of new methods. Some achievements are independent of each other to test for breadth of exploration, while others depend on each other to test for deep exploration.
+
+\paragraph{Reward}
+Crafter provides a sparse reward signal that is the sum of two components. The main component is a reward of $+1$ every time the agent unlocks each achievement for the first time during the current episode. The second component is a reward of $-0.1$ for every health point lost and a reward of $+0.1$ for every health point that is regenerated. Because the maximum number of health points is 9, the second reward component only affects the first decimal of the episode return, and ceiling the episode return yields the number of achievements unlocked during the episode.
+
+\paragraph{Success rates}
+The success rates offer insights into the breadth of abilities learned by an agent. The success rates are computed separately for each of the achievements, as the fraction of training episodes during which the agent has unlocked the achievement at least once. It is computed across all episodes that lead up to the budget of 1M environment steps, requiring agents to be data-efficient.\footnote{While allowing a large number of environment steps would help agents achieve higher scores more easily, it would result in a comparison of compute resources rather than algorithm quality.} Note that the number of environment steps is fixed but the number of episodes can differ between agents. Unlocking an achievement more than once per episode does not affect the success rate.
+
+\paragraph{Score}
+The score summarizes the agent abilities into a single number. It is computed by aggregating the success rates for the individual achievements. Unlocking difficult achievements, even if it happens rarely, should contribute more than increasing the success rate of achievements that are already unlocked frequently even further. To account for the range of difficulties of the achievements, we average the success rates in log-space, known as the geometric mean.\footnote{The Crafter score of an agent is computed as $S\doteq\exp(\frac{1}{N}\sum_{i=1}^{N}\ln(1+s_i))-1$, where $s_i \in [0;100]$ is the agent's success rate of achievement $i$ and $N=22$ is the number of achievements.} Unlike the reward, the score thus takes the achievement's difficulties into account, without having to know them beforehand.
+
+\paragraph{Discussion}
+Aggregating across tasks via a geometric mean weighs tasks based on their difficulty to the agent, resulting in higher scores for agents that explore more broadly. For example, collecting a diamond 1\% of the time instead of 0\% is a meaningful improvement, whereas collecting wood 95\% of the time instead of 90\% is not. This allows distinguishing how broadly agents have explored their environment even if they achieve similar rewards. The geometric mean also establishes a meaningful metric for unsupervised agents, which may get bored of tasks after performing them a few times and then move on to new tasks. A caveat of the geometric mean is that agents with rewards are evaluated by something they only indirectly optimize for, which can change their ranking order. Increasing reward and score is generally correlated, but capacity-limited agents may choose to optimize reward by mastering easy tasks and ignoring hard tasks, which only slowly increases the geometric mean.
+
+\subsection{Research Challenges}
+\label{sec:challenges}
+
+Crafter aims to evaluate a diverse range of agent abilities within a single environment. Thus, if a method performs well on Crafter there should be a high chance that it also handles the challenges of other environments. The challenges also make Crafter suitable for evaluating progress on open research questions, such as strong generalization, wide and deep exploration, discovering reusable skills, and long-term memory and reasoning. Crafter is designed to pose the following challenges:
+
+\paragraph{Exploration}
+Independent achievements evaluate wide exploration, without offering a linear path for the agent to follow. Dependent achievements evaluate deep exploration of the technology tree. Collecting a diamond requires an iron pickaxe, which in turn requires a furnace, table, coal, iron, and wood. The furnace requires collecting stone, which requires building a wood pickaxe at a table.
+
+\paragraph{Generalization}
+Every episode is situated in a unique world that is procedurally generated. Moreover, many aspects of the game reoccur in different contexts, such as creatures and resources that can be found in different landscapes and times of day. This forces successful agents to recognize similar situations in different circumstances and be robust to changes in irrelevant details.
+
+\paragraph{Reusable skills}
+Advancing in the game requires the agent to repeat several behaviors over long horizons, such as finding food, defending against monsters, and collecting common materials that are needed many times. The behavior of a successful agent naturally decomposes into sub-tasks, making Crafter suitable for studying hierarchical reinforcement learning.
+
+\paragraph{Credit assignment}
+Only sparse rewards are given for unlocking an achievement for the first time during each episode. Moreover, several achievements require long-term reasoning, such as collecting the necessary resources for crafting a particular tool or planting saplings that can be harvested many hundred time steps later. This makes Crafter a challenge for temporal credit assignment.
+
+\paragraph{Memory}
+The agent inputs only show the player's immediate surroundings, making Crafter partially observed. To survive for a long time, agents need to remember where to find lakes to drink and open grasslands to hunt. Moreover, to effectively find rare resources, such as iron and diamonds, the agent needs to remember what parts of the map it has already searched.
+
+\paragraph{Representation}
+The agent observes its environment via high-dimensional images, from which it has to extract entities that are meaningful for decision making. Similar to applications in the real world, the reward signal is sparse and the amount of environment interaction limited. As a result, successful agents will likely rely on explicit representation learning techniques.
+
+\paragraph{Survival}
+In previous environments, the player can often survive by doing nothing. This allows for degenerate solutions to intrinsic objectives, unlike the real world where animals are forced to adapt to survive and maintain homeostasis and allostasis. In Crafter, the player struggles to survive through the constant pressure of maintaining enough water, food, rest, and defending against zombies.

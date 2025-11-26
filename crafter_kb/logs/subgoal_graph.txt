@@ -1,0 +1,8 @@
+collect_sapling; collect_water; collect_wood; defeat_skeleton; defeat_zombie; eat_cow; sleep
+collect_sapling -> place_plant; collect_wood -> place_table
+place_plant -> eat_plant; collect_wood & place_table -> make_wood_pickaxe; collect_wood & place_table -> make_wood_sword
+make_wood_pickaxe -> collect_coal; make_wood_pickaxe -> collect_stone; make_wood_sword -> defeat_skeleton; make_wood_sword -> defeat_zombie
+collect_stone & collect_wood & place_table -> make_stone_pickaxe; collect_stone & collect_wood & place_table -> make_stone_sword; collect_stone -> place_furnace; collect_stone -> place_stone
+make_stone_pickaxe -> collect_iron; make_stone_sword -> defeat_skeleton; make_stone_sword -> defeat_zombie
+collect_coal & collect_iron & collect_wood & place_furnace -> make_iron_pickaxe; collect_coal & collect_iron & collect_wood & place_furnace -> make_iron_sword
+make_iron_pickaxe -> collect_diamond; make_iron_sword -> defeat_skeleton; make_iron_sword -> defeat_zombie
