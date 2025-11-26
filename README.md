@@ -1,4 +1,4 @@
-# 📄 Subgoal Graph-Augmented Planning for LLM-Guided Open-World Reinforcement Learning
+# 📄 Subgoal Graph-Augmented Planning for LLM-Guided Reinforcement Learning
 
 The official repository of our SGA-ACR framework.
 
